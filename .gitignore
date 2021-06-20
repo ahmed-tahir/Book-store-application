@@ -1,0 +1,6 @@
+# VS directory
+.vs/
+
+# .NET build files
+bin/
+obj/
