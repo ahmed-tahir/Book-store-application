@@ -1,4 +1,5 @@
-﻿@model Book
+﻿@using BookStoreApplication.Enums
+@model Book
 @{ 
     ViewBag.Title = "Add Book";
 }
@@ -6,26 +7,61 @@
 <!--Form to add a new book-->
 <div class="container">
     <h3 class="display-4">Add new Book</h3>
-    <form method="post" asp-action="AddNewBook">
+    <hr />
+    <!--Success alert message-->
+    @if(ViewBag.IsSuccess == true)
+    { 
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Congratulations!</strong> Book has been added successfully.<br/>
+            Click <a asp-controller="Book" asp-action="GetBook" asp-route-id="@ViewBag.BookID">here</a> to view the details.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+    <form method="post" asp-controller="Book" asp-action="AddNewBook">
+        <!--Validation summary-->
+        <div asp-validation-summary="None" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="Language"></label>
+            <select asp-for="Language" class="form-control" asp-items="Html.GetEnumSelectList<LanguageEnum>()">
+                <option value="">Please select a language</option>
+            </select>
+            <span asp-validation-for="Language" class="text-danger"></span>
+        </div>
+
+        <!--Multiselect dropdown-->
+        @*<div class="form-group">
+            <label asp-for="MultiLanguage"></label>
+            <select asp-for="MultiLanguage" class="form-control" asp-items="ViewBag.Language" multiple>
+                <option value="">Please select a language</option>
+            </select>
+            <span asp-validation-for="MultiLanguage" class="text-danger"></span>
+        </div>*@
+        
         <div class="form-group">
             <label asp-for="Title"></label>
             <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="text-danger"></span>
         </div>
 
         <div class="form-group">
             <label asp-for="Author"></label>
             <input asp-for="Author" class="form-control" />
+            <span asp-validation-for="Author" class="text-danger"></span>
         </div>
 
         <div class="form-group">
             <label asp-for="TotalPages"></label>
             <input asp-for="TotalPages" class="form-control" />
+            <span asp-validation-for="TotalPages" class="text-danger"></span>
         </div>
 
         <div class="form-group">
             <label asp-for="Description"></label>
-            <textarea asp-for="Description" class="form-control">
-            </textarea>
+            <textarea asp-for="Description" class="form-control"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
         <div class="form-group">

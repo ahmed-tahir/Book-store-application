@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BookStoreApplication.Data;
+using BookStoreApplication.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -26,7 +28,9 @@ namespace BookStoreApplication
             #endif
 
             // enables using entity framework by proving a Dbcontext class
-            //services.AddDbContext<BookStoreContext>();
+            services.AddDbContext<BookStoreContext>(options => options.UseSqlServer("Server=TAHIRAHMEDT_I5;Database=BookStore;Integrated Security=True;"));
+
+            services.AddScoped<BookRepository, BookRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

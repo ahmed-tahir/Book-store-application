@@ -5,26 +5,27 @@ using System.Threading.Tasks;
 using BookStoreApplication.Models;
 using BookStoreApplication.Repository;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BookStoreApplication.Controllers
 {
     public class BookController : Controller
     {
         private readonly BookRepository _bookRepository = null;
-        public BookController()
+        public BookController(BookRepository bookRepository)
         {
-            _bookRepository = new BookRepository();
+            _bookRepository = bookRepository;
         }
 
-        public ViewResult GetAllBooks()
+        public async Task<IActionResult> GetAllBooks()
         {
-            var books = _bookRepository.GetAllBooks();
+            var books = await _bookRepository.GetAllBooks();
             return View(books);
         }
 
-        public ViewResult GetBook(int id)
+        public async Task<IActionResult> GetBook(int id)
         {
-            var data = _bookRepository.GetBookById(id);
+            var data = await _bookRepository.GetBookById(id);
             return View(data);
         }
 
@@ -33,15 +34,52 @@ namespace BookStoreApplication.Controllers
             return _bookRepository.SearchBook(bookname, authorName);
         }
 
-        public ViewResult AddNewBook()
+        public ViewResult AddNewBook(bool isSuccess = false, int bookID = 0)
         {
+            // Populating dropdown values from database
+            //ViewBag.Language = new List<SelectListItem>()
+            //{
+            //    new SelectListItem(){ Text = "English", Value = "1"},
+            //    new SelectListItem(){ Text = "Hindi"  , Value = "2"},
+            //    new SelectListItem(){ Text = "Spanish", Value = "3"},
+            //    new SelectListItem(){ Text = "Dutch"  , Value = "4"},
+            //    new SelectListItem(){ Text = "French" , Value = "5"},
+            //    new SelectListItem(){ Text = "Mandarin", Value = "6"}
+            //};
+
+            ViewBag.IsSuccess = isSuccess;
+            ViewBag.BookID = bookID;
             return View();
         }
 
         [HttpPost]
-        public ViewResult AddNewBook(Book bookModel)
+        public async Task<IActionResult> AddNewBook(Book bookModel)
         {
+            if(ModelState.IsValid)
+            {
+
+                int id = await _bookRepository.AddNewBook(bookModel);
+                if(id > 0) 
+                    return RedirectToAction(nameof(AddNewBook), new { isSuccess = true, bookID = id});
+                return View();
+            }
+
+            ViewBag.Language = new SelectList(GetLanguage(), "ID", "Text");
+            // Adding custom model error message
+            //ModelState.AddModelError("", "This is my custom error message");
+
             return View();
+        }
+
+        private List<Language> GetLanguage()
+        {
+            return new List<Language>()
+            {
+                new Language(){ ID = 1, Text = "English"},
+                new Language(){ ID = 2, Text = "Hindi" },
+                new Language(){ ID = 3, Text = "Spanish"},
+                new Language(){ ID = 4, Text = "Dutch"}
+            };
         }
     }
 }
