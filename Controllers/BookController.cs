@@ -12,9 +12,11 @@ namespace BookStoreApplication.Controllers
     public class BookController : Controller
     {
         private readonly BookRepository _bookRepository = null;
-        public BookController(BookRepository bookRepository)
+        private readonly LanguageRepository _languageRepository = null;
+        public BookController(BookRepository bookRepository, LanguageRepository languageRepository)
         {
             _bookRepository = bookRepository;
+            _languageRepository = languageRepository;
         }
 
         public async Task<IActionResult> GetAllBooks()
@@ -34,9 +36,11 @@ namespace BookStoreApplication.Controllers
             return _bookRepository.SearchBook(bookname, authorName);
         }
 
-        public ViewResult AddNewBook(bool isSuccess = false, int bookID = 0)
+        public async Task<ViewResult> AddNewBook(bool isSuccess = false, int bookID = 0)
         {
             // Populating dropdown values from database
+            ViewBag.Language = new SelectList(await _languageRepository.GetLanguages(), "ID", "Name");
+
             //ViewBag.Language = new List<SelectListItem>()
             //{
             //    new SelectListItem(){ Text = "English", Value = "1"},
@@ -64,22 +68,13 @@ namespace BookStoreApplication.Controllers
                 return View();
             }
 
-            ViewBag.Language = new SelectList(GetLanguage(), "ID", "Text");
+            ViewBag.Language = new SelectList(await _languageRepository.GetLanguages(), "ID", "Name");
+            //ViewBag.Language = new SelectList(GetLanguage(), "ID", "Text");
             // Adding custom model error message
             //ModelState.AddModelError("", "This is my custom error message");
 
             return View();
         }
 
-        private List<Language> GetLanguage()
-        {
-            return new List<Language>()
-            {
-                new Language(){ ID = 1, Text = "English"},
-                new Language(){ ID = 2, Text = "Hindi" },
-                new Language(){ ID = 3, Text = "Spanish"},
-                new Language(){ ID = 4, Text = "Dutch"}
-            };
-        }
     }
 }

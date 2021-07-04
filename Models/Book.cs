@@ -1,4 +1,5 @@
 ﻿using BookStoreApplication.Enums;
+using BookStoreApplication.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -13,6 +14,7 @@ namespace BookStoreApplication.Models
 
         [StringLength(100, MinimumLength = 5)]
         [Required(ErrorMessage = "Please enter the title of your book")]
+        //[Custom("Custom error for custom attribute")]
         public string Title { get; set; }
 
         [StringLength(30, MinimumLength = 3)]
@@ -22,10 +24,9 @@ namespace BookStoreApplication.Models
         public string Category { get; set; }
 
         [Required(ErrorMessage = "Please select the language of your book")]
-        public string Language { get; set; } = "English";
+        public int LanguageID { get; set; }
 
-        [Required(ErrorMessage = "Please select the languages of your book")]
-        public LanguageEnum MultiLanguage { get; set; }
+        public string Language { get; set; }
 
         [Display(Name = "Total Pages")]
         [Required(ErrorMessage = "Please enter the total pages")]

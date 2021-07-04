@@ -19,18 +19,26 @@ namespace BookStoreApplication
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            // tells our application to use controllers and views
+            // tells our application to use controllers and views.
             services.AddControllersWithViews();
 
-            // enables runtime compilation of razor views
             #if DEBUG
-            services.AddRazorPages().AddRazorRuntimeCompilation();
+            // enables runtime compilation of razor views.
+            services.AddRazorPages().AddRazorRuntimeCompilation().AddViewOptions((options) => 
+            {
+                // disabling client-side validations.
+                options.HtmlHelperOptions.ClientValidationEnabled = false;
+            });
+
+
             #endif
 
-            // enables using entity framework by proving a Dbcontext class
+            // enables using entity framework by proving a Dbcontext class.
             services.AddDbContext<BookStoreContext>(options => options.UseSqlServer("Server=TAHIRAHMEDT_I5;Database=BookStore;Integrated Security=True;"));
 
+            // resolving dependencies at run time using Dependency Injection.
             services.AddScoped<BookRepository, BookRepository>();
+            services.AddScoped<LanguageRepository, LanguageRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
