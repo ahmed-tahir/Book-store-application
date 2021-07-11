@@ -27,7 +27,8 @@ namespace BookStoreApplication.Repository
                 Title = model.Title,
                 TotalPages = model.TotalPages.HasValue ? model.TotalPages.Value : 0,
                 CreatedDate = DateTime.UtcNow,
-                UpdatedDate = DateTime.UtcNow
+                UpdatedDate = DateTime.UtcNow,
+                CoverImageUrl = model.CoverImageUrl
             };
             await _context.Books.AddAsync(newBook);
             var response = await _context.SaveChangesAsync();
@@ -36,26 +37,18 @@ namespace BookStoreApplication.Repository
 
         public async Task<List<Book>> GetAllBooks()
         {
-            List<Book> books = new List<Book>();
-            var allBooks = await _context.Books.ToListAsync();
-            if(allBooks?.Any() == true)
+            return await _context.Books.Select(book => new Book() 
             {
-                foreach(Books item in allBooks)
-                {
-                    books.Add(new Book() 
-                    {
-                        Author = item.Author,
-                        Category = item.Category,
-                        Description = item.Description,
-                        ID = item.ID,
-                        LanguageID = item.LanguageID,
-                        Language = item.Language.Name,
-                        Title = item.Title,
-                        TotalPages = item.TotalPages
-                    });
-                }
-            }
-            return books;
+                Author = book.Author,
+                Category = book.Category,
+                Description = book.Description,
+                ID = book.ID,
+                LanguageID = book.LanguageID,
+                Language = book.Language.Name,
+                Title = book.Title,
+                TotalPages = book.TotalPages,
+                CoverImageUrl = book.CoverImageUrl
+            }).ToListAsync(); 
         }
 
         public async Task<Book> GetBookById(int id)
@@ -69,7 +62,8 @@ namespace BookStoreApplication.Repository
                 LanguageID = book.LanguageID,
                 Language = book.Language.Name,
                 Title = book.Title,
-                TotalPages = book.TotalPages
+                TotalPages = book.TotalPages,
+                CoverImageUrl = book.CoverImageUrl
             }).FirstOrDefaultAsync();
             return book;
         }

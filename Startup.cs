@@ -24,11 +24,12 @@ namespace BookStoreApplication
 
             #if DEBUG
             // enables runtime compilation of razor views.
-            services.AddRazorPages().AddRazorRuntimeCompilation().AddViewOptions((options) => 
-            {
-                // disabling client-side validations.
-                options.HtmlHelperOptions.ClientValidationEnabled = false;
-            });
+            services.AddRazorPages().AddRazorRuntimeCompilation();
+            //.AddViewOptions((options) => 
+            //{
+            //    // disabling client-side validations.
+            //    options.HtmlHelperOptions.ClientValidationEnabled = false;
+            //});
 
 
             #endif

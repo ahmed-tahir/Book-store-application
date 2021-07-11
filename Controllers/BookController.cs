@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BookStoreApplication.Models;
 using BookStoreApplication.Repository;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -13,10 +15,12 @@ namespace BookStoreApplication.Controllers
     {
         private readonly BookRepository _bookRepository = null;
         private readonly LanguageRepository _languageRepository = null;
-        public BookController(BookRepository bookRepository, LanguageRepository languageRepository)
+        private readonly IWebHostEnvironment _webHostEnvironment = null;
+        public BookController(BookRepository bookRepository, LanguageRepository languageRepository, IWebHostEnvironment webHostEnvironment)
         {
             _bookRepository = bookRepository;
             _languageRepository = languageRepository;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public async Task<IActionResult> GetAllBooks()
@@ -61,7 +65,17 @@ namespace BookStoreApplication.Controllers
         {
             if(ModelState.IsValid)
             {
+                // saving the cover image to server
+                if(bookModel.CoverPhoto != null)
+                {
+                    string folderURL = "books/cover/";
+                    folderURL += Guid.NewGuid().ToString() + "_" + bookModel.CoverPhoto.FileName;
+                    // server path where image will be saved
+                    string serverFolder = Path.Combine(_webHostEnvironment.WebRootPath, folderURL);
+                    bookModel.CoverImageUrl = folderURL;
 
+                    await bookModel.CoverPhoto.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
+                }
                 int id = await _bookRepository.AddNewBook(bookModel);
                 if(id > 0) 
                     return RedirectToAction(nameof(AddNewBook), new { isSuccess = true, bookID = id});
