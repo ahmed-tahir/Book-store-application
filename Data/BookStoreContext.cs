@@ -26,6 +26,7 @@ namespace BookStoreApplication.Data
         //}
 
         public DbSet<Books> Books { get; set; }
+        public DbSet<BooksGallery> BooksGallery { get; set; }
         public DbSet<Languages> Languages { get; set; }
     }
 }

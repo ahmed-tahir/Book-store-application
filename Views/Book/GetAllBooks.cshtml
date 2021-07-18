@@ -1,4 +1,4 @@
-﻿@model IEnumerable<BookStoreApplication.Models.Book>
+﻿@model IEnumerable<BookStoreApplication.Models.BookModel>
 @{
     ViewBag.Title = "All Books";
 }
@@ -20,7 +20,7 @@
         {
             <div class="col-md-4">
                 <div class="card mb-4 shadow-sm">
-                    <img src="@book.CoverImageUrl" class="img-thumbnail" />
+                    <img src="@book.CoverImageUrl" class="img-thumbnail img-fluid" style="height: 400px; width: 400px"/>
                     <div class="card-body">
                         <h3 class="card-title">@book.Title</h3>
                         <p class="card-text">@book.Description</p>

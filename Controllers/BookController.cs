@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BookStoreApplication.Models;
 using BookStoreApplication.Repository;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -35,7 +36,7 @@ namespace BookStoreApplication.Controllers
             return View(data);
         }
 
-        public List<Book> SearchBook(string bookname, string authorName)
+        public List<BookModel> SearchBook(string bookname, string authorName)
         {
             return _bookRepository.SearchBook(bookname, authorName);
         }
@@ -61,22 +62,39 @@ namespace BookStoreApplication.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddNewBook(Book bookModel)
+        public async Task<IActionResult> AddNewBook(BookModel bookModel)
         {
             if(ModelState.IsValid)
             {
-                // saving the cover image to server
+                // saving the cover image to server and database
                 if(bookModel.CoverPhoto != null)
                 {
                     string folderURL = "books/cover/";
-                    folderURL += Guid.NewGuid().ToString() + "_" + bookModel.CoverPhoto.FileName;
-                    // server path where image will be saved
-                    string serverFolder = Path.Combine(_webHostEnvironment.WebRootPath, folderURL);
-                    bookModel.CoverImageUrl = folderURL;
-
-                    await bookModel.CoverPhoto.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
+                    bookModel.CoverImageUrl = await UploadImageToServer(folderURL, bookModel.CoverPhoto);
+                }
+                // saving gallery images to server and database
+                if (bookModel.GalleryImages != null)
+                {
+                    string folderURL = "books/gallery/";
+                    bookModel.Gallery = new List<BookGallery>();
+                    foreach(var file in bookModel.GalleryImages)
+                    {
+                        var gallery = new BookGallery() 
+                        {
+                            Name = file.FileName,
+                            URL = await UploadImageToServer(folderURL, file)
+                        };
+                        bookModel.Gallery.Add(gallery);
+                    }
+                }
+                // saving the book pdf to server and database
+                if(bookModel.BookPdf != null)
+                {
+                    string folderURL = "books/pdf/";
+                    bookModel.BookPdfUrl = await UploadImageToServer(folderURL, bookModel.BookPdf);
                 }
                 int id = await _bookRepository.AddNewBook(bookModel);
+
                 if(id > 0) 
                     return RedirectToAction(nameof(AddNewBook), new { isSuccess = true, bookID = id});
                 return View();
@@ -90,5 +108,13 @@ namespace BookStoreApplication.Controllers
             return View();
         }
 
+        private async Task<string> UploadImageToServer(string folderPath, IFormFile file)
+        {            
+            folderPath += Guid.NewGuid().ToString() + "_" + file.FileName;
+            // server path where image will be saved
+            string serverFolder = Path.Combine(_webHostEnvironment.WebRootPath, folderPath);
+            await file.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
+            return String.Concat("/", folderPath);
+        }
     }
 }

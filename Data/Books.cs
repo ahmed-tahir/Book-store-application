@@ -16,7 +16,9 @@ namespace BookStoreApplication.Data
         public Languages Language { get; set; }
         public int TotalPages { get; set; }
         public string CoverImageUrl { get; set; }
+        public string BookPdfUrl { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
+        public ICollection<BooksGallery> BookGallery { get; set; }
     }
 }

@@ -29,6 +29,9 @@ namespace BookStoreApplication.Migrations
                     b.Property<string>("Author")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("BookPdfUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Category")
                         .HasColumnType("nvarchar(max)");
 
@@ -60,6 +63,29 @@ namespace BookStoreApplication.Migrations
                     b.ToTable("Books");
                 });
 
+            modelBuilder.Entity("BookStoreApplication.Data.BooksGallery", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BookID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("URL")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("BookID");
+
+                    b.ToTable("BooksGallery");
+                });
+
             modelBuilder.Entity("BookStoreApplication.Data.Languages", b =>
                 {
                     b.Property<int>("ID")
@@ -83,6 +109,15 @@ namespace BookStoreApplication.Migrations
                     b.HasOne("BookStoreApplication.Data.Languages", "Language")
                         .WithMany("Books")
                         .HasForeignKey("LanguageID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("BookStoreApplication.Data.BooksGallery", b =>
+                {
+                    b.HasOne("BookStoreApplication.Data.Books", "Book")
+                        .WithMany("BookGallery")
+                        .HasForeignKey("BookID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
