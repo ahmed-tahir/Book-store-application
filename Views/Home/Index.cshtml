@@ -41,9 +41,9 @@
     </a>
 </div>
 
-<section class="jumbotron text-center">
+<section class="text-center p-5">
     <div class="container">
-        <h2 class="h1">Welcome to Book Store website</h2>
+        <h2 class="h1">Welcome to the Book Store website</h2>
         <!--environment tag helpers-->
         <environment names="Development">
             <h3 class="">Development</h3>
@@ -60,6 +60,21 @@
         </p>
     </div>
 </section>
+
+<!--Top books-->
+<div class="py-5 bg-light" id="similarBooks">
+    <div class="container">
+        <h3 class="h3">Top Books</h3>
+            <!--View component-->
+
+            <!--Html helper-->
+            @*@await Component.InvokeAsync("TopBooks", new { count = 3 })*@
+
+            <!--Tag helper-->
+            <vc:top-books count="3"></vc:top-books>
+        
+    </div>
+</div>
 
 @section scripts{ 
     <script>
