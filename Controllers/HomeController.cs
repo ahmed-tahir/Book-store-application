@@ -6,19 +6,23 @@ using System.Threading.Tasks;
 
 namespace BookStoreApplication.Controllers
 {
+    [Route("Home")]
     public class HomeController : Controller
     {
+        [Route("~/")]
         public ViewResult Index()
         {
             return View();
         }
 
-        public ViewResult About()
+        [Route("About-Us")]
+        public ViewResult AboutUs()
         {
             return View();
         }
 
-        public ViewResult Contact()
+        [Route("Contact-Us")]
+        public ViewResult ContactUs()
         {
             return View();
         }
