@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace BookStoreApplication.Repository
 {
-    public class BookRepository
+    public class BookRepository : IBookRepository
     {
         private readonly BookStoreContext _context = null;
 
         public BookRepository(BookStoreContext context)
         {
-            _context = context;   
+            _context = context;
         }
 
         public async Task<int> AddNewBook(BookModel model)
@@ -34,7 +34,7 @@ namespace BookStoreApplication.Repository
 
             // adding gallery images
             newBook.BookGallery = new List<BooksGallery>();
-            foreach(var file in model.Gallery)
+            foreach (var file in model.Gallery)
             {
                 newBook.BookGallery.Add(new BooksGallery() { Name = file.Name, URL = file.URL });
             }
@@ -45,7 +45,7 @@ namespace BookStoreApplication.Repository
 
         public async Task<List<BookModel>> GetAllBooks()
         {
-            return await _context.Books.Select(book => new BookModel() 
+            return await _context.Books.Select(book => new BookModel()
             {
                 Author = book.Author,
                 Category = book.Category,
@@ -56,7 +56,7 @@ namespace BookStoreApplication.Repository
                 Title = book.Title,
                 TotalPages = book.TotalPages,
                 CoverImageUrl = book.CoverImageUrl
-            }).ToListAsync(); 
+            }).ToListAsync();
         }
 
         public async Task<List<BookModel>> GetTopBooksAsync(int count)
@@ -89,7 +89,7 @@ namespace BookStoreApplication.Repository
                 TotalPages = book.TotalPages,
                 CoverImageUrl = book.CoverImageUrl,
                 BookPdfUrl = book.BookPdfUrl,
-                Gallery = book.BookGallery.Select(g => new BookGallery() { ID = g.ID, Name = g.Name, URL = g.URL}).ToList()
+                Gallery = book.BookGallery.Select(g => new BookGallery() { ID = g.ID, Name = g.Name, URL = g.URL }).ToList()
             }).FirstOrDefaultAsync();
             return book;
         }

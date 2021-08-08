@@ -38,8 +38,8 @@ namespace BookStoreApplication
             services.AddDbContext<BookStoreContext>(options => options.UseSqlServer("Server=TAHIRAHMEDT_I5;Database=BookStore;Integrated Security=True;"));
 
             // resolving dependencies at run time using Dependency Injection.
-            services.AddScoped<BookRepository, BookRepository>();
-            services.AddScoped<LanguageRepository, LanguageRepository>();
+            services.AddScoped<IBookRepository, BookRepository>();
+            services.AddScoped<ILanguageRepository, LanguageRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,7 +56,10 @@ namespace BookStoreApplication
 
             app.UseEndpoints(endpoints =>
             {
+                //endpoints.MapControllers();
+
                 endpoints.MapDefaultControllerRoute();
+
                 //endpoints.MapControllerRoute(
                 //    name: "Default",
                 //    pattern: "{controller=Home}/{action=Index}/{id?}");

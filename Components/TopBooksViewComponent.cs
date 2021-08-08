@@ -9,9 +9,9 @@ namespace BookStoreApplication.Components
 {
     public class TopBooksViewComponent : ViewComponent
     {
-        private readonly BookRepository _bookRepository = null;
+        private readonly IBookRepository _bookRepository = null;
 
-        public TopBooksViewComponent(BookRepository bookRepository)
+        public TopBooksViewComponent(IBookRepository bookRepository)
         {
             _bookRepository = bookRepository;
         }

@@ -14,22 +14,24 @@ namespace BookStoreApplication.Controllers
 {
     public class BookController : Controller
     {
-        private readonly BookRepository _bookRepository = null;
-        private readonly LanguageRepository _languageRepository = null;
+        private readonly IBookRepository _bookRepository = null;
+        private readonly ILanguageRepository _languageRepository = null;
         private readonly IWebHostEnvironment _webHostEnvironment = null;
-        public BookController(BookRepository bookRepository, LanguageRepository languageRepository, IWebHostEnvironment webHostEnvironment)
+        public BookController(IBookRepository bookRepository, ILanguageRepository languageRepository, IWebHostEnvironment webHostEnvironment)
         {
             _bookRepository = bookRepository;
             _languageRepository = languageRepository;
             _webHostEnvironment = webHostEnvironment;
         }
 
+        [Route("All-books")]
         public async Task<IActionResult> GetAllBooks()
         {
             var books = await _bookRepository.GetAllBooks();
             return View(books);
         }
 
+        [Route("book-details/{id:int}")]
         public async Task<IActionResult> GetBook(int id)
         {
             var data = await _bookRepository.GetBookById(id);
@@ -41,6 +43,7 @@ namespace BookStoreApplication.Controllers
             return _bookRepository.SearchBook(bookname, authorName);
         }
 
+        [HttpGet]
         public async Task<ViewResult> AddNewBook(bool isSuccess = false, int bookID = 0)
         {
             // Populating dropdown values from database
