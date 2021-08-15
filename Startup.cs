@@ -7,7 +7,9 @@ using BookStoreApplication.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -17,8 +19,19 @@ namespace BookStoreApplication
     {
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+
+        private readonly IConfiguration _configuration;
+        public Startup(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
+            // adding Identity core services
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                    .AddEntityFrameworkStores<BookStoreContext>();
+
             // tells our application to use controllers and views.
             services.AddControllersWithViews();
 
@@ -31,11 +44,10 @@ namespace BookStoreApplication
             //    options.HtmlHelperOptions.ClientValidationEnabled = false;
             //});
 
-
             #endif
 
             // enables using entity framework by proving a Dbcontext class.
-            services.AddDbContext<BookStoreContext>(options => options.UseSqlServer("Server=TAHIRAHMEDT_I5;Database=BookStore;Integrated Security=True;"));
+            services.AddDbContext<BookStoreContext>(options => options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
 
             // resolving dependencies at run time using Dependency Injection.
             services.AddScoped<IBookRepository, BookRepository>();
@@ -53,6 +65,9 @@ namespace BookStoreApplication
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            // Identity core authentication feature
+            app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>
             {

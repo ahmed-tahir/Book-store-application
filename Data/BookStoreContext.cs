@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BookStoreApplication.Data
 {
-    public class BookStoreContext : DbContext
+    public class BookStoreContext : IdentityDbContext
     {
         public BookStoreContext()
         {
@@ -18,7 +19,7 @@ namespace BookStoreApplication.Data
 
         }
 
-        // This cpiece of code can also be written in the startup class under ConfigureServices() method.
+        // This piece of code can also be written in the startup class under ConfigureServices() method.
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{
         //    optionsBuilder.UseSqlServer("Server=TAHIRAHMEDT_I5;Database=BookStore;Integrated Security=True;");

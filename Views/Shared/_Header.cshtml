@@ -1,4 +1,11 @@
-﻿<!--This is a partial view of header element-->
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration _configuration 
+@{ 
+    var newBook = _configuration.GetSection("NewBookAlert");
+}
+
+
+<!--This is a partial view of header element-->
 <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <a class="navbar-brand" href="/">
@@ -38,4 +45,12 @@
             </form>
         </div>
     </nav>
+
+    <!--New book alert-->
+    @if(newBook.GetValue<bool>("DisplayNewBookAlert"))
+    { 
+        <div class="alert alert-danger mb-0 text-center" role="alert">
+            @(newBook.GetValue<string>("BookName"))
+        </div>
+    }
 </header>
