@@ -1,4 +1,5 @@
 ﻿using BookStoreApplication.Models;
+using BookStoreApplication.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -12,10 +13,12 @@ namespace BookStoreApplication.Controllers
     public class HomeController : Controller
     {
         private readonly IConfiguration _configuration;
+        private readonly IUserService _userService;
 
-        public HomeController(IConfiguration configuration)
+        public HomeController(IConfiguration configuration, IUserService userService)
         {
             _configuration = configuration;
+            _userService = userService;
         }
 
         [Route("~/")]
@@ -47,6 +50,8 @@ namespace BookStoreApplication.Controllers
         [Route("About-Us")]
         public ViewResult AboutUs()
         {
+            var userID = _userService.GetUserId();
+            bool isLoggedIn = _userService.IsAuthenticated();
             return View();
         }
 

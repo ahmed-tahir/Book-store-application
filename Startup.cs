@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BookStoreApplication.Data;
+using BookStoreApplication.Helpers;
+using BookStoreApplication.Models;
 using BookStoreApplication.Repository;
+using BookStoreApplication.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -29,8 +32,25 @@ namespace BookStoreApplication
         public void ConfigureServices(IServiceCollection services)
         {
             // adding Identity core services
-            services.AddIdentity<IdentityUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, IdentityRole>()
                     .AddEntityFrameworkStores<BookStoreContext>();
+
+            // configuring Identity using IdentityOptions
+            services.Configure<IdentityOptions>(options => 
+            {
+                options.Password.RequiredLength = 5;
+                options.Password.RequiredUniqueChars = 1;
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+            });
+
+            // redirect user to login page if authorization fails
+            services.ConfigureApplicationCookie(config => 
+            {
+                config.LoginPath = _configuration["Application:LoginPath"];
+            });
 
             // tells our application to use controllers and views.
             services.AddControllersWithViews();
@@ -52,6 +72,10 @@ namespace BookStoreApplication
             // resolving dependencies at run time using Dependency Injection.
             services.AddScoped<IBookRepository, BookRepository>();
             services.AddScoped<ILanguageRepository, LanguageRepository>();
+            services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IUserService, UserService>();
+
+            services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationUserClaimsPrincipalFactory>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -68,6 +92,7 @@ namespace BookStoreApplication
 
             // Identity core authentication feature
             app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using BookStoreApplication.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BookStoreApplication.Data
 {
-    public class BookStoreContext : IdentityDbContext
+    public class BookStoreContext : IdentityDbContext<ApplicationUser>
     {
         public BookStoreContext()
         {
