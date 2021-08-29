@@ -33,7 +33,8 @@ namespace BookStoreApplication
         {
             // adding Identity core services
             services.AddIdentity<ApplicationUser, IdentityRole>()
-                    .AddEntityFrameworkStores<BookStoreContext>();
+                    .AddEntityFrameworkStores<BookStoreContext>()
+                    .AddDefaultTokenProviders();
 
             // configuring Identity using IdentityOptions
             services.Configure<IdentityOptions>(options => 
@@ -44,6 +45,9 @@ namespace BookStoreApplication
                 options.Password.RequireLowercase = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
+
+                // allows only verified email ids to sign in
+                options.SignIn.RequireConfirmedEmail = true;
             });
 
             // redirect user to login page if authorization fails
@@ -74,8 +78,12 @@ namespace BookStoreApplication
             services.AddScoped<ILanguageRepository, LanguageRepository>();
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IEmailService, EmailService>();
 
             services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationUserClaimsPrincipalFactory>();
+
+            // services related to read data from configuration file
+            services.Configure<SMTPModel>(_configuration.GetSection("SMTPConfig"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,6 +1,7 @@
 ﻿using BookStoreApplication.Models;
 using BookStoreApplication.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,12 +14,17 @@ namespace BookStoreApplication.Repository
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
+        private readonly IConfiguration _configuration;
 
-        public AccountRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IUserService userService)
+        public AccountRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager
+                                , IUserService userService, IEmailService emailService, IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _userService = userService;
+            _emailService = emailService;
+            _configuration = configuration;
         }
         
         /// <summary>
@@ -37,6 +43,23 @@ namespace BookStoreApplication.Repository
                 PhoneNumber = userModel.PhoneNumber
             };
             var result = await _userManager.CreateAsync(user, userModel.Password);
+            if(result.Succeeded)
+            {
+                await GenerateEmailConfirmationTokenAsync(user);
+            }
+            return result;
+        }
+
+        public async Task GenerateEmailConfirmationTokenAsync(ApplicationUser user)
+        {
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            // send the token to the user's registered email id for confirmation
+            await SendEmailConfirmationAsync(user, token);
+        }
+
+        public async Task <ApplicationUser> GetUserByEmailAsync(string email)
+        {
+            var result = await _userManager.FindByEmailAsync(email);
             return result;
         }
 
@@ -66,6 +89,36 @@ namespace BookStoreApplication.Repository
             string userID = _userService.GetUserId();
             ApplicationUser user = await _userManager.FindByIdAsync(userID);
             var result = await _userManager.ChangePasswordAsync(user, changePasswordModel.CurrentPassword, changePasswordModel.NewPassword);
+            return result;
+        }
+
+        /// <summary>
+        /// This method sends an email for confirmation of email after user registration
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        private async Task SendEmailConfirmationAsync(ApplicationUser user, string token)
+        {
+            string appDomain = _configuration.GetValue<string>("Application:AppDomain");
+            string confirmationLink = _configuration.GetValue<string>("Application:EmailConfirmation");
+
+            UserEmailOptions options = new UserEmailOptions()
+            {
+                ToEmails = new List<string>() { user.Email },
+                PlaceHolders = new List<KeyValuePair<string, string>>()
+                {
+                    new KeyValuePair<string, string>("{{UserName}}", user.FirstName),
+                    new KeyValuePair<string, string>("{{Link}}", String.Format(appDomain + confirmationLink, user.Id, token))
+                }
+            };
+            await _emailService.SendEmailConfirmation(options);
+        }
+
+        public async Task<IdentityResult> ConfirmEmailAsync(string uid, string token)
+        {
+            ApplicationUser user = await _userManager.FindByIdAsync(uid);
+            var result = await _userManager.ConfirmEmailAsync(user, token);
             return result;
         }
     }

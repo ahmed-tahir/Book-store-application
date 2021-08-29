@@ -14,11 +14,13 @@ namespace BookStoreApplication.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
 
-        public HomeController(IConfiguration configuration, IUserService userService)
+        public HomeController(IConfiguration configuration, IUserService userService, IEmailService emailService)
         {
             _configuration = configuration;
             _userService = userService;
+            _emailService = emailService;
         }
 
         [Route("~/")]
@@ -56,8 +58,17 @@ namespace BookStoreApplication.Controllers
         }
 
         [Route("Contact-Us")]
-        public ViewResult ContactUs()
+        public async Task<ViewResult> ContactUs()
         {
+            UserEmailOptions options = new UserEmailOptions() 
+            { 
+                ToEmails = new List<string>() { "tahirahmed.tapadhar@learningmate.com" },
+                PlaceHolders = new List<KeyValuePair<string, string>>()
+                {
+                    new KeyValuePair<string, string>("{{UserName}}", "Tahir")
+                }
+            };
+            await _emailService.SendTestEmail(options);
             return View();
         }
     }
