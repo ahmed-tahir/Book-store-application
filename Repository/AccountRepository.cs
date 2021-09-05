@@ -57,6 +57,13 @@ namespace BookStoreApplication.Repository
             await SendEmailConfirmationAsync(user, token);
         }
 
+        public async Task GenerateForgotPasswordTokenAsync(ApplicationUser user)
+        {
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            // send the token to the user's registered email id for confirmation
+            await SendForgotPasswordAsync(user, token);
+        }
+
         public async Task <ApplicationUser> GetUserByEmailAsync(string email)
         {
             var result = await _userManager.FindByEmailAsync(email);
@@ -115,10 +122,34 @@ namespace BookStoreApplication.Repository
             await _emailService.SendEmailConfirmation(options);
         }
 
+        private async Task SendForgotPasswordAsync(ApplicationUser user, string token)
+        {
+            string appDomain = _configuration.GetValue<string>("Application:AppDomain");
+            string confirmationLink = _configuration.GetValue<string>("Application:ForgotPassword");
+
+            UserEmailOptions options = new UserEmailOptions()
+            {
+                ToEmails = new List<string>() { user.Email },
+                PlaceHolders = new List<KeyValuePair<string, string>>()
+                {
+                    new KeyValuePair<string, string>("{{UserName}}", user.FirstName),
+                    new KeyValuePair<string, string>("{{Link}}", String.Format(appDomain + confirmationLink, user.Id, token))
+                }
+            };
+            await _emailService.SendEmailForForgotPassword(options);
+        }
+
         public async Task<IdentityResult> ConfirmEmailAsync(string uid, string token)
         {
             ApplicationUser user = await _userManager.FindByIdAsync(uid);
             var result = await _userManager.ConfirmEmailAsync(user, token);
+            return result;
+        }
+
+        public async Task<IdentityResult> ResetPasswordAsync(ResetPasswordModel model)
+        {
+            ApplicationUser user = await _userManager.FindByIdAsync(model.UserID);
+            var result = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
             return result;
         }
     }

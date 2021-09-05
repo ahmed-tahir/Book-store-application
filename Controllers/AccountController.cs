@@ -1,5 +1,6 @@
 ﻿using BookStoreApplication.Models;
 using BookStoreApplication.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -42,7 +43,7 @@ namespace BookStoreApplication.Controllers
                 }
                 ModelState.Clear();
                 // redirect user to email confirmation view
-                return RedirectToAction("ConfirmEmail", new { email = userModel });
+                return RedirectToAction("ConfirmEmail", new { email = userModel.Email });
             }
             return View();
         }
@@ -150,6 +151,69 @@ namespace BookStoreApplication.Controllers
             else
             {
                 ModelState.AddModelError("", "Something went wrong");
+            }
+            return View(model);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("Forgot-password")]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("Forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordModel model)
+        {
+            if(ModelState.IsValid)
+            {
+                var user = await _accountRepository.GetUserByEmailAsync(model.Email);
+                if(user != null)
+                {
+                    await _accountRepository.GenerateForgotPasswordTokenAsync(user);
+                }
+                ModelState.Clear();
+                model.EmailSent = true;
+            }
+            return View(model);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("Reset-password")]
+        public IActionResult ResetPassword(string uid, string token)
+        {
+            ResetPasswordModel model = new ResetPasswordModel
+            {
+                Token = token,
+                UserID = uid
+            };
+            return View(model);
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("Reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                if(!String.IsNullOrEmpty(model.Token))
+                    model.Token = model.Token.Replace(' ', '+');
+                var result = await _accountRepository.ResetPasswordAsync(model);
+                if(result.Succeeded)
+                {
+                    ModelState.Clear();
+                    model.IsSuccess = true;
+                    return View(model);
+                }
+                foreach(var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
             }
             return View(model);
         }

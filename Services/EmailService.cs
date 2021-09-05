@@ -35,6 +35,13 @@ namespace BookStoreApplication.Services
             await SendEmailAsync(emailOptions);
         }
 
+        public async Task SendEmailForForgotPassword(UserEmailOptions emailOptions)
+        {
+            emailOptions.Subject = UpdatePlaceHolders("Hello {{UserName}}, you can reset your password from here", emailOptions.PlaceHolders);
+            emailOptions.Body = UpdatePlaceHolders(GetEmailBody("ForgotPassword"), emailOptions.PlaceHolders);
+            await SendEmailAsync(emailOptions);
+        }
+
         private async Task SendEmailAsync(UserEmailOptions emailOptions)
         {
             // Setting up the email fields
