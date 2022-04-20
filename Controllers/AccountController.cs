@@ -68,7 +68,10 @@ namespace BookStoreApplication.Controllers
                         return LocalRedirect(returnURL);
                     return RedirectToAction("Index", "Home");
                 }
-                if (result.IsNotAllowed) ModelState.AddModelError("", "You are not allowed to login");
+                if (result.IsNotAllowed)
+                    ModelState.AddModelError("", "You are not allowed to login");
+                else if (result.IsLockedOut)
+                    ModelState.AddModelError("", "Account is locked. Please try again later");
                 else ModelState.AddModelError("", "Invalid credentials");
             }
             return View();

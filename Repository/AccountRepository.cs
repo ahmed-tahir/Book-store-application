@@ -13,15 +13,17 @@ namespace BookStoreApplication.Repository
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IUserService _userService;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
 
-        public AccountRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager
+        public AccountRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager
                                 , IUserService userService, IEmailService emailService, IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
             _userService = userService;
             _emailService = emailService;
             _configuration = configuration;
@@ -77,7 +79,7 @@ namespace BookStoreApplication.Repository
         /// <returns></returns>
         public async Task<SignInResult> SignInAsync(SignInModel signInModel)
         {
-            var result = await _signInManager.PasswordSignInAsync(signInModel.Email, signInModel.Password, signInModel.RememberMe, false);
+            var result = await _signInManager.PasswordSignInAsync(signInModel.Email, signInModel.Password, signInModel.RememberMe, true);
             return result;
         }
 
@@ -150,6 +152,12 @@ namespace BookStoreApplication.Repository
         {
             ApplicationUser user = await _userManager.FindByIdAsync(model.UserID);
             var result = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
+            return result;
+        }
+
+        public async Task<IdentityResult> CreateRoleAsync(IdentityRole model)
+        {
+            var result = await _roleManager.CreateAsync(model);
             return result;
         }
     }

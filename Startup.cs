@@ -48,6 +48,16 @@ namespace BookStoreApplication
 
                 // allows only verified email ids to sign in
                 options.SignIn.RequireConfirmedEmail = true;
+
+                // locking out the user after a given number of failed login attempts
+                options.Lockout.MaxFailedAccessAttempts = 3;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(1);
+            });
+
+            // setting the token life span
+            services.Configure<DataProtectionTokenProviderOptions>(options => 
+            {
+                options.TokenLifespan = TimeSpan.FromHours(1);   
             });
 
             // redirect user to login page if authorization fails
@@ -111,6 +121,10 @@ namespace BookStoreApplication
                 //endpoints.MapControllerRoute(
                 //    name: "Default",
                 //    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                endpoints.MapControllerRoute(
+                    name: "MyArea",
+                    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
             });
         }
     }

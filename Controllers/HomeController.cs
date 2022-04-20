@@ -1,5 +1,6 @@
 ﻿using BookStoreApplication.Models;
 using BookStoreApplication.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -57,6 +58,7 @@ namespace BookStoreApplication.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         [Route("Contact-Us")]
         public async Task<ViewResult> ContactUs()
         {
